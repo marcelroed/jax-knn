@@ -61,10 +61,16 @@ class CMakeBuildExt(build_ext):
             ),
             "-DCMAKE_PREFIX_PATH={}".format(pybind11.get_cmake_dir()),
         ]
-        if os.environ.get("KEPLER_JAX_CUDA", "no").lower() == "yes":
-            cmake_args.append("-DKEPLER_JAX_CUDA=yes")
+
+        if os.environ.get("kdknn_JAX_CUDA", "no").lower() == "yes":
+            cmake_args.append("-Dkdknn_JAX_CUDA=yes")
 
         os.makedirs(self.build_temp, exist_ok=True)
+
+        print('OUTPUT COMING HERE')
+        print(subprocess.check_output(["which", "cmake"], cwd=self.build_temp))
+        print(f'{self.build_temp}')
+        print('OUTPUT COMING HERE')
         subprocess.check_call(
             ["cmake", HERE] + cmake_args, cwd=self.build_temp
         )
@@ -88,32 +94,31 @@ class CMakeBuildExt(build_ext):
 
 extensions = [
     Extension(
-        "kepler_jax.cpu_ops",
-        ["src/kepler_jax/src/cpu_ops.cc"],
+        "kdknn_jax.cpu_ops",
+        ["src/kdknn_jax/src/cpu_ops.cc"],
     ),
 ]
 
-if os.environ.get("KEPLER_JAX_CUDA", "no").lower() == "yes":
+if os.environ.get("kdknn_JAX_CUDA", "no").lower() == "yes":
     extensions.append(
         Extension(
-            "kepler_jax.gpu_ops",
+            "kdknn_jax.gpu_ops",
             [
-                "src/kepler_jax/src/gpu_ops.cc",
-                "src/kepler_jax/src/cuda_kernels.cc.cu",
+                "src/kdknn_jax/src/gpu_ops.cc",
+                "src/kdknn_jax/src/cuda_kernels.cc.cu",
             ],
         )
     )
 
 
 setup(
-    name="kepler_jax",
-    author="Dan Foreman-Mackey",
-    author_email="foreman.mackey@gmail.com",
-    url="https://github.com/dfm/extending-jax",
+    name="kdknn_jax",
+    author="Marcel Rød",
+    author_email="marcelroed@gmail.com",
+    url="https://github.com/marcelroed/knn-jax",
     license="MIT",
     description=(
-        "A simple demonstration of how you can extend JAX with custom C++ and "
-        "CUDA ops"
+        "Implementation of KDTree KNN search in JAX using CPU and CUDA"
     ),
     long_description=read("README.md"),
     long_description_content_type="text/markdown",

@@ -5,21 +5,21 @@
 // particularly efficient or robust implementation. It's just here to demonstrate the
 // infrastructure required to extend JAX.
 
-#ifndef _KEPLER_JAX_KEPLER_H_
-#define _KEPLER_JAX_KEPLER_H_
+#ifndef _KDKNN_JAX_KDKNN_H_
+#define _KDKNN_JAX_KDKNN_H_
 
 #include <cmath>
 
-namespace kepler_jax {
+namespace kdknn_jax {
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288
 #endif
 
 #ifdef __CUDACC__
-#define KEPLER_JAX_INLINE_OR_DEVICE __host__ __device__
+#define KDKNN_JAX_INLINE_OR_DEVICE __host__ __device__
 #else
-#define KEPLER_JAX_INLINE_OR_DEVICE inline
+#define KDKNN_JAX_INLINE_OR_DEVICE inline
 
 template <typename T>
 inline void sincos(const T& x, T* sx, T* cx) {
@@ -29,7 +29,7 @@ inline void sincos(const T& x, T* sx, T* cx) {
 #endif
 
 template <typename T>
-KEPLER_JAX_INLINE_OR_DEVICE void compute_eccentric_anomaly(const T& mean_anom, const T& ecc,
+KDKNN_JAX_INLINE_OR_DEVICE void compute_eccentric_anomaly(const T& mean_anom, const T& ecc,
                                                            T* sin_ecc_anom, T* cos_ecc_anom) {
   const T tol = 1e-12;
   T g, E = (mean_anom < M_PI) ? mean_anom + 0.85 * ecc : mean_anom - 0.85 * ecc;
@@ -41,6 +41,6 @@ KEPLER_JAX_INLINE_OR_DEVICE void compute_eccentric_anomaly(const T& mean_anom, c
   }
 }
 
-}  // namespace kepler_jax
+}  // namespace kdknn_jax
 
 #endif

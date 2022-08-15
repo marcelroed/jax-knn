@@ -355,7 +355,7 @@ and use the `registrations` dictionary that we defined:
 
 ```python
 from jax.lib import xla_client
-from kepler_jax import cpu_ops
+from kdknn_jax import cpu_ops
 
 for _name, _value in cpu_ops.registrations().items():
     xla_client.register_cpu_custom_call_target(_name, _value)
@@ -366,7 +366,7 @@ find in the source code is a little more complicated since it supports both CPU
 and GPU translation):
 
 ```python
-# src/kepler_jax/kepler_jax.py
+# src/kdknn_jax/kdknn_jax.py
 import numpy as np
 
 def _kepler_cpu_translation(c, mean_anom, ecc):
@@ -623,13 +623,14 @@ endif()
 Then, to expose this to JAX, we need to update the translation rule from above as follows:
 
 ```python
-# src/kepler_jax/kepler_jax.py
+# src/kdknn_jax/kdknn_jax.py
 import numpy as np
 from jax.lib import xla_client
-from kepler_jax import gpu_ops
+from kdknn_jax import gpu_ops
 
 for _name, _value in gpu_ops.registrations().items():
     xla_client.register_custom_call_target(_name, _value, platform="gpu")
+
 
 def _kepler_gpu_translation(c, mean_anom, ecc):
     # Most of this function is the same as the CPU version above...
@@ -656,6 +657,7 @@ def _kepler_gpu_translation(c, mean_anom, ecc):
         shape_with_layout=xla_client.Shape.tuple_shape((shape, shape)),
         opaque=opaque,
     )
+
 
 xla.backend_specific_translations["gpu"][_kepler_prim] = _kepler_gpu_translation
 ```

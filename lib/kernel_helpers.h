@@ -3,15 +3,15 @@
 // descriptors that are used with the "opaque" parameter of the GPU custom call. In our example
 // we'll use this parameter to pass the size of our problem.
 
-#ifndef _KEPLER_JAX_KERNEL_HELPERS_H_
-#define _KEPLER_JAX_KERNEL_HELPERS_H_
+#ifndef _KDKNN_JAX_KERNEL_HELPERS_H_
+#define _KDKNN_JAX_KERNEL_HELPERS_H_
 
 #include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 
-namespace kepler_jax {
+namespace kdknn_jax {
 
 // https://en.cppreference.com/w/cpp/numeric/bit_cast
 template <class To, class From>
@@ -41,6 +41,6 @@ const T* UnpackDescriptor(const char* opaque, std::size_t opaque_len) {
   return bit_cast<const T*>(opaque);
 }
 
-}  // namespace kepler_jax
+}  // namespace kdknn_jax
 
 #endif

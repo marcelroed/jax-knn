@@ -2,15 +2,15 @@
 // It is exposed as a standard pybind11 module defining "capsule" objects containing our
 // method. For simplicity, we export a separate capsule for each supported dtype.
 
-#include "kepler.h"
+#include "kdknn.h"
 #include "pybind11_kernel_helpers.h"
 
-using namespace kepler_jax;
+using namespace kdknn_jax;
 
 namespace {
 
 template <typename T>
-void cpu_kepler(void *out_tuple, const void **in) {
+void cpu_kdknn(void *out_tuple, const void **in) {
   // Parse the inputs
   const std::int64_t size = *reinterpret_cast<const std::int64_t *>(in[0]);
   const T *mean_anom = reinterpret_cast<const T *>(in[1]);
@@ -28,8 +28,8 @@ void cpu_kepler(void *out_tuple, const void **in) {
 
 pybind11::dict Registrations() {
   pybind11::dict dict;
-  dict["cpu_kepler_f32"] = EncapsulateFunction(cpu_kepler<float>);
-  dict["cpu_kepler_f64"] = EncapsulateFunction(cpu_kepler<double>);
+  dict["cpu_kdknn_f32"] = EncapsulateFunction(cpu_kdknn<float>);
+  dict["cpu_kdknn_f64"] = EncapsulateFunction(cpu_kdknn<double>);
   return dict;
 }
 

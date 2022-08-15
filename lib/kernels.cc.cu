@@ -2,16 +2,16 @@
 // and I make no promises about the quality of the code or the choices made therein, but
 // it should get the point accross.
 
-#include "kepler.h"
+#include "kdknn.h"
 #include "kernel_helpers.h"
 #include "kernels.h"
 
-namespace kepler_jax {
+namespace kdknn_jax {
 
 namespace {
 
 template <typename T>
-__global__ void kepler_kernel(std::int64_t size, const T *mean_anom, const T *ecc, T *sin_ecc_anom,
+__global__ void kdknn_kernel(std::int64_t size, const T *mean_anom, const T *ecc, T *sin_ecc_anom,
                               T *cos_ecc_anom) {
   for (std::int64_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < size;
        idx += blockDim.x * gridDim.x) {
@@ -26,9 +26,9 @@ void ThrowIfError(cudaError_t error) {
 }
 
 template <typename T>
-inline void apply_kepler(cudaStream_t stream, void **buffers, const char *opaque,
+inline void apply_kdknn(cudaStream_t stream, void **buffers, const char *opaque,
                          std::size_t opaque_len) {
-  const KeplerDescriptor &d = *UnpackDescriptor<KeplerDescriptor>(opaque, opaque_len);
+  const KdknnDescriptor &d = *UnpackDescriptor<KdknnDescriptor>(opaque, opaque_len);
   const std::int64_t size = d.size;
 
   const T *mean_anom = reinterpret_cast<const T *>(buffers[0]);
@@ -38,7 +38,7 @@ inline void apply_kepler(cudaStream_t stream, void **buffers, const char *opaque
 
   const int block_dim = 128;
   const int grid_dim = std::min<int>(1024, (size + block_dim - 1) / block_dim);
-  kepler_kernel<T>
+  kdknn_kernel<T>
       <<<grid_dim, block_dim, 0, stream>>>(size, mean_anom, ecc, sin_ecc_anom, cos_ecc_anom);
 
   ThrowIfError(cudaGetLastError());
@@ -46,14 +46,14 @@ inline void apply_kepler(cudaStream_t stream, void **buffers, const char *opaque
 
 }  // namespace
 
-void gpu_kepler_f32(cudaStream_t stream, void **buffers, const char *opaque,
+void gpu_kdknn_f32(cudaStream_t stream, void **buffers, const char *opaque,
                     std::size_t opaque_len) {
-  apply_kepler<float>(stream, buffers, opaque, opaque_len);
+  apply_kdknn<float>(stream, buffers, opaque, opaque_len);
 }
 
-void gpu_kepler_f64(cudaStream_t stream, void **buffers, const char *opaque,
+void gpu_kdknn_f64(cudaStream_t stream, void **buffers, const char *opaque,
                     std::size_t opaque_len) {
-  apply_kepler<double>(stream, buffers, opaque, opaque_len);
+  apply_kdknn<double>(stream, buffers, opaque, opaque_len);
 }
 
-}  // namespace kepler_jax
+}  // namespace kdknn_jax
